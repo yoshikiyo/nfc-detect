@@ -1,28 +1,47 @@
-# Training data
+# NFC Detect
 
-Training data consists of audio files and annotations associated with them.
+NFC Detect is a tool to train audio classification models from labeled audio data.
+It leverages publicly available audio neural network models trained using bird song recordings, such as
+[Google Perch](https://github.com/google-research/perch/tree/main) or
+[BirdNET](https://github.com/kahst/BirdNET-Analyzer).
+Pre-trained models are used to compute embeddings from audio input, which is then used as input features of classification model.
 
-* Filename
-* Annotation
-  * Label
-  * Start time
-  * Duration
+The primary goal of the project is to detect nocturnal flight calls of migratory birds.
 
-## CSV format
+# Getting started
 
-CSV format is expected for annotation data. The following four fields should be present for each record. Other fields are ignored.
+## Installation
 
-* `filename`: Path to an audio file (string)
-* `label`: Label of the segment (string)
-* `start`: Start time of the segment into the audio file specified by `filename` field in seconds (float)
-* `duration`: Duration of the segment in seconds (float)
+You can add nfc-detect to your dependency using `poetry add`.
 
-### Example
 ```
-filename,label,start,duration
-01.wav,zeep,10.1,0.5
-01.wav,noise,23.7,0.7
-...
-02.wav,xxx,xx,xx
-02.wav,xxx,xx,xx
+poetry add git+https://github.com/yoshikiyo/nfc-detect.git
 ```
+
+
+## Inference
+
+Trained models can be loaded and used for inference, as shown below:
+
+```
+import librosa
+
+from nfcdetect import (
+  config,
+  classifier
+)
+
+CLASSFIER_CONFIG = 'sample_model.json'
+INPUT = 'sample_audio.WAV'
+START = 0.0      # Start position of audio segment to analyze
+DURATION = 30.0  # Duration of audio segment to analyze
+
+cls = classifier.EmbeddingClassifier.create_from_json(CLASSIFIER_CONFIG)
+
+sr = cls.get_config().embedding_config.sampling_rate
+audio, sr = librosa.load(INPUT, sr=sr, offset=START, duration=DURATION)
+
+predictions = cls.predict(audio)
+```
+
+See `analyze.py` for a full example.
