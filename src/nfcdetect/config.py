@@ -15,4 +15,4 @@ class ClassifierConfig(BaseModel):
     crop_size: float = 1.0  # In seconds
     padding_method: str = 'repeat'
     padding_offset: float = 0
-    classifier_model_path: str
+    classifier_model_path: str = None

@@ -3,16 +3,11 @@
 
 import argparse
 import csv
+
 import librosa
 import numpy as np
-import matplotlib.pyplot as plt
-import sys
-import time
 
-from nfcdetect import (
-  config,
-  classifier
-)
+from nfcdetect import classifier
 
 def main():
     parser = argparse.ArgumentParser()
@@ -29,9 +24,9 @@ def main():
                         help='Path to output of NFC classification results in CSV format.')
     args = parser.parse_args()
 
-    cls = classifier.EmbeddingClassifier.create_from_json(args.classifier_config)
+    cls = classifier.EmbeddingClassifier.create_from_config(args.classifier_config)
 
-    sr = cls.get_config().embedding_config.sampling_rate
+    sr = cls.cfg.embedding_config.sampling_rate
     audio, sr = librosa.load(args.input,
                              sr=sr,
                              offset=args.start,
@@ -40,14 +35,18 @@ def main():
     # Truncate array as librosa can sometimes load more samples than requested.
     audio = audio[:int(np.ceil(args.duration * sr))]
 
-    predictions = cls.predict(audio)
+    predictions, classes = cls.predict(audio)
 
-    with open(args.output, 'w', newline='') as f:
+    with open(args.output, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow(['position', 'prob'])
-        for idx in range(len(predictions)):
+        header = ['position']
+        header.extend(classes)
+        writer.writerow(header)
+        for idx, prediction in enumerate(predictions):
             pos = args.start + idx
-            writer.writerow([f'{pos:.3f}', f'{predictions[idx]:.6f}'])
+            row = [f'{pos:.3f}']
+            row.extend([f'{p:.6f}' for p in prediction])
+            writer.writerow(row)
 
 if __name__ == '__main__':
     main()

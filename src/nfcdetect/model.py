@@ -42,3 +42,5 @@ def create_embedding_model(config: EmbeddingConfig) -> AudioEmbeddingModel:
         return BirdNetModel()
     elif config.name == 'perch':
         return BirdVocalizationModel()
+    else:
+        raise ValueError(f'Uknown model type: {config.name}')
