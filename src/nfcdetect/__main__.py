@@ -101,7 +101,7 @@ def main():
     parser.add_argument('--embedding_model', type=str,
                         help='Type of embedding model. Accepts "perch" or "birdnet"')
     parser.add_argument('--padding_method', )
-    parser.add_argument('--batch_size', type=int, default=256,
+    parser.add_argument('--batch_size', type=int, default=64,
                         help='Batch size to use for inference.')
     parser.add_argument('--jitter', action='store_true', default=False,
                         help='Apply jitter when cropping frame from annotated audio.')

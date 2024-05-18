@@ -1,10 +1,11 @@
-from .config import EmbeddingConfig
+'''Wrapper classes of embedding models.
+'''
 
-import birdnetlib
-import numpy as np
-import sys
-import tensorflow as tf
+import os
+
 import tensorflow_hub as hub
+
+from .config import EmbeddingConfig
 
 
 class AudioEmbeddingModel(object):
@@ -17,6 +18,7 @@ class BirdVocalizationModel(AudioEmbeddingModel):
     MODEL_URL = 'https://www.kaggle.com/models/google/bird-vocalization-classifier/frameworks/TensorFlow2/variations/bird-vocalization-classifier/versions/4'
 
     def __init__(self):
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
         self.model = hub.load(self.MODEL_URL)
     
     def embed(self, frames):
@@ -28,6 +30,7 @@ class BirdNetModel(AudioEmbeddingModel):
     """Wrapper class of BirdNet model."""
 
     def __init__(self):
+        import birdnetlib
         self.analyzer = birdnetlib.analyzer.Analyzer()
         
         # Hack needed to make _return_embeddings() actually return embeddings instead of logits
